@@ -25,9 +25,9 @@ MongoClient.connect(url, function(err, client) {
 
   db.collection("Users").insertOne(
     {
-      name: "Manisha",
-      age: "43",
-      location: "Palitana"
+      name: "Hemu",
+      age: "22",
+      location: "Bhavnagar"
     },
     (err, r) => {
       assert.equal(null, err);
