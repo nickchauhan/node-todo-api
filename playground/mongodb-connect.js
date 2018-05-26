@@ -18,16 +18,16 @@ MongoClient.connect(url, function(err, client) {
   // Insert a single document
   //   db
   //     .collection("Todos")
-  //     .insertOne({ text: "Some task", completed: false }, (err, r) => {
+  //     .insertOne({ task: "Some task", completed: false }, (err, r) => {
   //       assert.equal(null, err);
   //       assert.equal(1, r.insertedCount);
   //     });
 
   db.collection("Users").insertOne(
     {
-      name: "Dilip",
-      age: "45",
-      location: "Gujarat"
+      name: "Manisha",
+      age: "43",
+      location: "Palitana"
     },
     (err, r) => {
       assert.equal(null, err);
@@ -37,5 +37,5 @@ MongoClient.connect(url, function(err, client) {
     }
   );
 
-  client.close();
+//   client.close();
 });
