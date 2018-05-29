@@ -11,14 +11,15 @@ const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
+// Post Todo
 app.post("/todos", (req, res) => {
   var todo = new Todo({
     task: req.body.task
   });
 
   todo.save().then(
-    doc => {
-      res.send(doc);
+    todo => {
+      res.send({ todo });
     },
     e => {
       res.status(400).send(e);
@@ -26,6 +27,7 @@ app.post("/todos", (req, res) => {
   );
 });
 
+// Get all todos
 app.get("/todos", (req, res) => {
   Todo.find().then(
     todos => {
@@ -37,6 +39,7 @@ app.get("/todos", (req, res) => {
   );
 });
 
+// Get Todo By Id
 app.get("/todos/:id", (req, res) => {
   let id = req.params.id;
 
@@ -48,13 +51,34 @@ app.get("/todos/:id", (req, res) => {
       if (!todo) {
         return res.status(404).send();
       }
-      res.send(todo);
+      res.send({ todo });
     })
     .catch(e => {
       res.status(400).send(e);
     });
 });
 
+// Remove Todo by Id
+app.delete("/todos/:id", (req, res) => {
+  let id = req.params.id;
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send();
+  }
+
+  Todo.findByIdAndRemove(id)
+    .then(todo => {
+      if (!todo) {
+        return res.status(404).send();
+      }
+
+      res.send({ todo });
+    })
+    .catch(e => {
+      res.status(400).send(e);
+    });
+});
+
+// Server Start
 app.listen(port, () => {
   console.log(`Server up at Port ${port}`);
 });
