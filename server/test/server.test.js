@@ -109,7 +109,6 @@ describe("GET todo /todo/:id", done => {
 });
 
 // Test for DELETE Todo Id
-
 describe("DELETE Todo /todos/:id ", done => {
   it("should return the deleted doc", done => {
     var hexId = todos[0]._id.toHexString();
@@ -134,5 +133,56 @@ describe("DELETE Todo /todos/:id ", done => {
             done(err);
           });
       });
+  });
+
+  it("should return 404 if todo not found", done => {
+    let id = new ObjectID();
+    request(app)
+      .delete(`/todos/${id.toHexString()}`)
+      .expect(404)
+      .end(done);
+  });
+
+  it("it should return 404 if object ID is invalid", done => {
+    request(app)
+      .delete(`/todos/2234j2k3`)
+      .expect(404)
+      .end(done);
+  });
+});
+
+// Test for UPDATE todos
+describe("PATCH Todo /todos/:id", done => {
+  it("should update the todo", done => {
+    let id = todos[0]._id.toHexString();
+    let task = "Change the task from test";
+
+    request(app)
+      .patch(`/todos/${id}`)
+      .send({ task, completed: true })
+      .expect(200)
+      .expect(res => {
+        expect(res.body.task).toBe(task);
+        expect(res.body.completed).toBe(true);
+        expect(res.body.completedAt).toBeDefined();
+      })
+      .end(done);
+  });
+
+  it("should clear completedAt when todo is not completed", done => {
+
+    let id = todos[0]._id.toHexString();
+    let task = "Change the task from test";
+
+    request(app)
+      .patch(`/todos/${id}`)
+      .send({ task, completed: false })
+      .expect(200)
+      .expect(res => {
+        expect(res.body.task).toBe(task);
+        expect(res.body.completed).toBe(false);
+        expect(res.body.completedAt).toBeNull();
+      })
+      .end(done);
   });
 });
