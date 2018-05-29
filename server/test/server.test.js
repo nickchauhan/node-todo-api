@@ -81,7 +81,6 @@ describe("GET /todos", () => {
 });
 
 // Test for GET todo /todo/:id
-
 describe("GET todo /todo/:id", done => {
   it("should return the todo doc", done => {
     request(app)
@@ -106,5 +105,34 @@ describe("GET todo /todo/:id", done => {
       .get(`/todos/2234j2k3`)
       .expect(404)
       .end(done);
+  });
+});
+
+// Test for DELETE Todo Id
+
+describe("DELETE Todo /todos/:id ", done => {
+  it("should return the deleted doc", done => {
+    var hexId = todos[0]._id.toHexString();
+
+    request(app)
+      .delete(`/todos/${hexId}`)
+      .expect(200)
+      .expect(res => {
+        expect(res.body._id).toBe(hexId);
+      })
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        Todo.findById(hexId)
+          .then(todo => {
+            expect(todo).toBeFalsy();
+            done();
+          })
+          .catch(err => {
+            done(err);
+          });
+      });
   });
 });
