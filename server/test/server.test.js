@@ -170,7 +170,6 @@ describe("PATCH Todo /todos/:id", done => {
   });
 
   it("should clear completedAt when todo is not completed", done => {
-
     let id = todos[0]._id.toHexString();
     let task = "Change the task from test";
 
