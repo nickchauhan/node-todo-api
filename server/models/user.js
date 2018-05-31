@@ -39,12 +39,31 @@ var UserSchema = new mongoose.Schema({
   ]
 });
 
-// Add methods to the User Model
+// Static are used on Model
+UserSchema.static("findByToken", function(token) {
+  var User = this;
+  var decoded;
+
+  try {
+    decoded = jwt.verify(token, "abc123");
+  } catch {
+    return Promise.reject();
+  }
+
+  return User.findOne({
+    _id: decoded._id,
+    "tokens.token": token,
+    "tokens.access": decoded.access
+  });
+});
+
+// Add methods (are used on user instances) to the User Model
 UserSchema.methods.toJSON = function() {
   var user = this;
   var userObject = user.toObject();
   return _.pick(userObject, ["_id", "email"]);
 };
+
 UserSchema.methods.generateAuthToken = function() {
   var user = this;
   var access = "auth";
