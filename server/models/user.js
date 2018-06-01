@@ -58,6 +58,25 @@ UserSchema.static("findByToken", function(token) {
   });
 });
 
+UserSchema.static("findByCrendentials", function(email, password) {
+  // console.log(email, password);
+  return User.findOne({ email }).then(usr => {
+    if (!usr) {
+      return Promise.reject("User not found");
+    }
+
+    return new Promise((resolve, reject) => {
+      bcrypt.compare(password, usr.password, (err, response) => {
+        if (response) {
+          resolve(usr);
+        } else {
+          reject("User password doesn't match");
+        }
+      });
+    });
+  });
+});
+
 //To hash the password
 UserSchema.pre("save", function(next) {
   var user = this;
