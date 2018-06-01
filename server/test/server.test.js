@@ -217,12 +217,16 @@ describe("POST /users", done => {
           return done(err);
         }
 
-        User.findOne({ email }).then(usr => {
-          expect(usr).toBeDefined();
-          expect(usr.email).toBe(email);
-          expect(usr.password).not.toBe(password);
-          done();
-        });
+        User.findOne({ email })
+          .then(usr => {
+            expect(usr).toBeDefined();
+            expect(usr.email).toBe(email);
+            expect(usr.password).not.toBe(password);
+            done();
+          })
+          .catch(e => {
+            done(e);
+          });
       });
   });
 
@@ -243,5 +247,62 @@ describe("POST /users", done => {
       })
       .expect(400)
       .end(done);
+  });
+});
+
+//Test POST /users/login route
+describe("POST /users/login", done => {
+  it("should return user for valid credentails", done => {
+    request(app)
+      .post("/users/login")
+      .send({
+        email: users[1].email,
+        password: users[1].password
+      })
+      .expect(200)
+      .expect(res => {
+        expect(res.body._id).toBe(users[1]._id.toHexString());
+        expect(res.body.email).toBe(users[1].email);
+        expect(res.header["x-auth"]).toBeDefined();
+      })
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        User.findById(users[1]._id)
+          .then(user => {
+            expect(user.tokens[0]).toMatchObject({
+              access: "auth",
+              token: res.header["x-auth"]
+            });
+            done();
+          })
+          .catch(e => done(e));
+      });
+  });
+
+  it("should reject the invalid login", done => {
+    request(app)
+      .post("/users/login")
+      .send({
+        email: users[1].email,
+        password: users[1].password + 1
+      })
+      .expect(400)
+      .expect(res => {
+        expect(res.header["x-auth"]).toBeUndefined();
+      })
+      .end(err => {
+        if (err) {
+          done(err);
+        }
+        User.findById(users[1]._id)
+          .then(user => {
+            expect(user.tokens.length).toBe(0);
+            done();
+          })
+          .catch(e => done(e));
+      });
   });
 });
