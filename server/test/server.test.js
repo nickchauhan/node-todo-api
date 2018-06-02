@@ -295,11 +295,32 @@ describe("POST /users/login", done => {
       })
       .end(err => {
         if (err) {
-          done(err);
+          return done(err);
         }
         User.findById(users[1]._id)
           .then(user => {
             expect(user.tokens.length).toBe(0);
+            done();
+          })
+          .catch(e => done(e));
+      });
+  });
+});
+
+describe("Delete User Token /users/me/token", done => {
+  it("should remove token of user", done => {
+    request(app)
+      .delete("/users/me/token")
+      .set("x-auth", users[0].tokens[0].token)
+      .expect(200)
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        User.findById(users[0]._id)
+          .then(usr => {
+            expect(usr.tokens.length).toBe(0);
             done();
           })
           .catch(e => done(e));

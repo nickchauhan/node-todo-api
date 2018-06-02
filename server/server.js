@@ -1,4 +1,5 @@
 require("./config/config");
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const _ = require("lodash");
@@ -142,6 +143,18 @@ app.post("/users/login", (req, res) => {
     })
     .catch(e => {
       res.status(400).send(e);
+    });
+});
+
+// Remove Token
+app.delete("/users/me/token", authenticate, (req, res) => {
+  req.user
+    .removeToken(req.token)
+    .then(() => {
+      res.status(200).send();
+    })
+    .catch(() => {
+      res.status(400).send();
     });
 });
 
