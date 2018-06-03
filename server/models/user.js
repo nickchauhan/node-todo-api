@@ -123,5 +123,6 @@ UserSchema.methods.removeToken = function(token) {
 var User = mongoose.model("Users", UserSchema);
 
 module.exports = {
-  User
+  User,
+  UserSchema
 };

@@ -4,45 +4,31 @@ const { ObjectID } = require("mongodb");
 const { Todo } = require("../../models/todo");
 const { User } = require("../../models/user");
 
-const todos = [
-  {
-    _id: new ObjectID(),
-    task: "Learn Angular 6"
-  },
-  {
-    _id: new ObjectID(),
-    task: "Learn Reack 16"
-  }
-];
-
-const populateTodos = done => {
-  Todo.remove({})
-    .then(() => {
-      return Todo.insertMany(todos);
-    })
-    .then(() => done());
-};
-
-const UserOne = new ObjectID();
-const UserTwo = new ObjectID();
+const UserOneID = new ObjectID();
+const UserTwoID = new ObjectID();
 
 const users = [
   {
-    _id: UserOne,
+    _id: UserOneID,
     email: "nikhilchauhan@gmail.com",
     password: "nick@pass",
     tokens: [
       {
         access: "auth",
-        token: jwt.sign({ _id: UserOne, access: "auth" }, "abc123").toString()
+        token: jwt.sign({ _id: UserOneID, access: "auth" }, "abc123").toString()
       }
     ]
   },
   {
-    _id: UserTwo,
+    _id: UserTwoID,
     email: "hemalichauhan@gmail.com",
     password: "hemi@pass",
-    tokens: []
+    tokens: [
+      {
+        access: "auth",
+        token: jwt.sign({ _id: UserTwoID, access: "auth" }, "abc123").toString()
+      }
+    ]
   }
 ];
 
@@ -53,6 +39,29 @@ const populateUsers = done => {
       var userTwo = new User(users[1]).save();
 
       return Promise.all([userOne, userTwo]);
+    })
+    .then(() => done());
+};
+
+const todos = [
+  {
+    _id: new ObjectID(),
+    task: "Learn Angular 6",
+    _creator: UserOneID
+  },
+  {
+    _id: new ObjectID(),
+    task: "Learn Reack 16",
+    completed: true,
+    completedAt: 8237489234,
+    _creator: UserTwoID
+  }
+];
+
+const populateTodos = done => {
+  Todo.remove({})
+    .then(() => {
+      return Todo.insertMany(todos);
     })
     .then(() => done());
 };
